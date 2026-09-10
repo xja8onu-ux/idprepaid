@@ -352,36 +352,53 @@
         }
 
         function handlePay(e) {
-            e.preventDefault();
-            
-            const operator = document.getElementById('operator').value;
-            const amount = Number(document.getElementById('amount').value);
-            const userId = document.getElementById('user-id').value;
-            const finalAmount = calculateLumpsumPrice(amount);
+    e.preventDefault();
+    
+    const operator = document.getElementById('operator').value;
+    const amount = Number(document.getElementById('amount').value);
+    const userId = document.getElementById('user-id').value;
+    const finalAmount = calculateLumpsumPrice(amount);
 
-            // Razorpay Gateway Options
-            const options = {
-                "key": RAZORPAY_KEY_ID,
-                "amount": Math.round(finalAmount * 100), // Paise में बदलता है
-                "currency": "INR",
-                "name": "ID Prepaid",
-                "description": operator + " Recharge for " + userId,
-                "handler": function (response) {
-                    // पेमेंट हो जाने के बाद एनीमेशन प्रोसेस चालू होगा
-                    startProcessAnimations(response.razorpay_payment_id, userId, operator, amount, finalAmount);
+    const options = {
+        "key": RAZORPAY_KEY_ID,
+        "amount": Math.round(finalAmount * 100),
+        "currency": "INR",
+        "name": "ID Prepaid",
+        "description": operator + " Recharge for " + userId,
+        
+        // ⚡ केवल UPI (GPay, PhonePe, Paytm) फ़ोकस करने के लिए यह जोड़ा गया है:
+        "config": {
+            "display": {
+                "blocks": {
+                    "banks": {
+                        "name": "Pay via UPI / Apps",
+                        "instruments": [
+                            {
+                                "method": "upi" // 👈 केवल UPI ही दिखाई देगा
+                            }
+                        ]
+                    }
                 },
-                "prefill": {
-                    "contact": userId
-                },
-                "theme": {
-                    "color": "#ef4444"
-                }
-            };
-
-            const rzp1 = new Razorpay(options);
-            rzp1.open();
+                "sequence": ["block.banks"]
+            }
+        },
+        
+        "handler": function (response) {
+            startProcessAnimations(response.razorpay_payment_id, userId, operator, amount, finalAmount);
+        },
+        "prefill": {
+            "contact": userId
+        },
+        "theme": {
+            "color": "#ef4444"
         }
+    };
 
+    const rzp1 = new Razorpay(options);
+    rzp1.open();
+}
+
+        
         // MULTI-STEP ANIMATION WORKFLOW
         function startProcessAnimations(payId, userId, operator, amount, finalAmount) {
             const modal = document.getElementById('status-modal');
