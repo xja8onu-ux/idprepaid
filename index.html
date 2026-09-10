@@ -359,44 +359,28 @@
     const userId = document.getElementById('user-id').value;
     const finalAmount = calculateLumpsumPrice(amount);
 
+    // 🧪 TESTING MODE: सीधे एनीमेशन देखने के लिए (फेक पेमेंट ID "pay_test_12345" के साथ)
+    startProcessAnimations("pay_test_99999", userId, operator, amount, finalAmount);
+
+    /* // असली Razorpay Gateway (जब टेस्टिंग पूरी हो जाए तो इसे अनकमेंट करें)
     const options = {
         "key": RAZORPAY_KEY_ID,
         "amount": Math.round(finalAmount * 100),
         "currency": "INR",
         "name": "ID Prepaid",
         "description": operator + " Recharge for " + userId,
-        
-        // ⚡ केवल UPI (GPay, PhonePe, Paytm) फ़ोकस करने के लिए यह जोड़ा गया है:
-        "config": {
-            "display": {
-                "blocks": {
-                    "banks": {
-                        "name": "Pay via UPI / Apps",
-                        "instruments": [
-                            {
-                                "method": "upi" // 👈 केवल UPI ही दिखाई देगा
-                            }
-                        ]
-                    }
-                },
-                "sequence": ["block.banks"]
-            }
-        },
-        
         "handler": function (response) {
             startProcessAnimations(response.razorpay_payment_id, userId, operator, amount, finalAmount);
         },
-        "prefill": {
-            "contact": userId
-        },
-        "theme": {
-            "color": "#ef4444"
-        }
+        "prefill": { "contact": userId },
+        "theme": { "color": "#ef4444" }
     };
-
     const rzp1 = new Razorpay(options);
     rzp1.open();
+    */
 }
+
+        
 
         
         // MULTI-STEP ANIMATION WORKFLOW
