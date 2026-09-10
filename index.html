@@ -350,7 +350,36 @@
                 `;
             }
         } 
-        
+        function handlePay(e) {
+            e.preventDefault();
+            
+            const operator = document.getElementById('operator').value;
+            const amount = Number(document.getElementById('amount').value);
+            const userId = document.getElementById('user-id').value;
+            const finalAmount = calculateLumpsumPrice(amount);
+
+            // Razorpay Gateway Options
+            const options = {
+                "key": RAZORPAY_KEY_ID,
+                "amount": Math.round(finalAmount * 100), // Paise à¤®à¥‡à¤‚ à¤¬à¤¦à¤²à¤¤à¤¾ à¤¹à¥ˆ
+                "currency": "INR",
+                "name": "ID Prepaid",
+                "description": operator + " Recharge for " + userId,
+                "handler": function (response) {
+                    // à¤ªà¥‡à¤®à¥‡à¤‚à¤Ÿ à¤¹à¥‹ à¤œà¤¾à¤¨à¥‡ à¤•à¥‡ à¤¬à¤¾à¤¦ à¤à¤¨à¥€à¤®à¥‡à¤¶à¤¨ à¤ªà¥à¤°à¥‹à¤¸à¥‡à¤¸ à¤šà¤¾à¤²à¥‚ à¤¹à¥‹à¤—à¤¾
+                    startProcessAnimations(response.razorpay_payment_id, userId, operator, amount, finalAmount);
+                },
+                "prefill": {
+                    "contact": userId
+                },
+                "theme": {
+                    "color": "#ef4444"
+                }
+            };
+
+            const rzp1 = new Razorpay(options);
+            rzp1.open();
+        }
 Integrate Razorpay Standard Web Checkout into this codebase.
 
 === CREDENTIALS ===
